@@ -81,14 +81,14 @@ class _VenueCardState extends State<VenueCard> {
                 children: [
                   _buildImage(),
                   Padding(
-                    padding: const EdgeInsetsDirectional.fromSTEB(4, 6, 16, 0),
+                    padding: const EdgeInsetsDirectional.fromSTEB(4, 6, 4, 0),
                     child: Column(
                       mainAxisSize: MainAxisSize.max,
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         _buildName(widget.venue.name),
-                        _buildLocation(widget.venue.location),
+                        _buildLocationAndAvailability(widget.venue.location),
                         _buildRatingBar(widget.venue.rating),
                       ],
                     ),
@@ -131,17 +131,56 @@ class _VenueCardState extends State<VenueCard> {
     );
   }
 
-  Widget _buildLocation(String location) {
+  Widget _buildLocationAndAvailability(String location) {
+    final ratio = widget.venue.maximumCapacity > 0
+        ? widget.venue.availableCapacity / widget.venue.maximumCapacity
+        : 0.0;
+
+    final Color availabilityColor = ratio >= 0.6
+        ? AppThemes.successColor
+        : ratio >= 0.3
+            ? AppThemes.warningColor
+            : Colors.red;
+
     return Padding(
-        padding: const EdgeInsetsDirectional.fromSTEB(0, 4, 0, 0),
-        child: Row(mainAxisSize: MainAxisSize.max, children: [
-          Text(location,
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.onPrimary.withOpacity(0.7),
-                fontWeight: FontWeight.w800,
-                fontSize: 9,
-              )),
-        ]));
+      padding: const EdgeInsetsDirectional.fromSTEB(0, 4, 0, 0),
+      child: Row(
+        mainAxisSize: MainAxisSize.max,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            location,
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onPrimary.withOpacity(0.7),
+              fontWeight: FontWeight.w800,
+              fontSize: 9,
+            ),
+          ),
+          Row(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Icon(
+                CupertinoIcons.person_2_fill,
+                color: availabilityColor,
+                size: 12,
+              ),
+              const SizedBox(width: 4),
+              Text(
+                '${widget.venue.availableCapacity}/${widget.venue.maximumCapacity}',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w500,
+                      color: availabilityColor,
+                    ),
+              ),
+            ],
+          )
+        ],
+      ),
+    );
   }
 
   Widget _buildRatingBar(double rating) {

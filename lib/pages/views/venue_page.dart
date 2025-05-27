@@ -241,6 +241,8 @@ class VenuePage extends StatelessWidget {
           const SizedBox(height: 8),
           _buildVenueLocation(ctx, model),
           const SizedBox(height: 8),
+          _buildAvailability(ctx, model),
+          const SizedBox(height: 8),
           _buildVenueHours(ctx, model),
           const SizedBox(height: 8),
           _buildVenueRating(ctx, model),
@@ -304,6 +306,38 @@ class VenuePage extends StatelessWidget {
     );
   }
 
+  Widget _buildAvailability(BuildContext ctx, VenuePageModel model) {
+    final ratio = model.venue.maximumCapacity > 0
+        ? model.venue.availableCapacity / model.venue.maximumCapacity
+        : 0.0;
+
+    final Color availabilityColor = ratio >= 0.6
+        ? AppThemes.successColor
+        : ratio >= 0.3
+            ? AppThemes.warningColor
+            : Colors.red;
+
+    return Row(
+      mainAxisSize: MainAxisSize.max,
+      crossAxisAlignment: CrossAxisAlignment.end,
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        Icon(
+          CupertinoIcons.person_2,
+          color: availabilityColor,
+          size: 16,
+        ),
+        const SizedBox(width: 8),
+        Text(
+          '${model.venue.availableCapacity} / ${model.venue.maximumCapacity} available',
+          style: Theme.of(ctx).textTheme.bodyMedium?.copyWith(
+                color: availabilityColor,
+              ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildVenueHours(BuildContext ctx, VenuePageModel model) {
     return Row(
       mainAxisSize: MainAxisSize.max,
@@ -318,9 +352,7 @@ class VenuePage extends StatelessWidget {
         const SizedBox(width: 8),
         Text(
           'Working hours: ${model.venue.workingHours}',
-          style: Theme.of(ctx).textTheme.bodyMedium?.copyWith(
-                decoration: TextDecoration.underline,
-              ),
+          style: Theme.of(ctx).textTheme.bodyMedium,
         ),
       ],
     );
@@ -558,19 +590,25 @@ class VenuePage extends StatelessWidget {
   }
 
   Widget _buildReserveSpotButton(BuildContext ctx, VenuePageModel model) {
+    bool isDisabled = model.venue.availableCapacity == 0;
+
     return Padding(
       padding: const EdgeInsetsDirectional.fromSTEB(36, 0, 36, 48),
       child: FFButtonWidget(
-        onPressed: () => model.reserve(),
+        onPressed: () => isDisabled ? null : model.reserve(),
         text: 'Reserve your spot now',
         options: FFButtonOptions(
           width: double.infinity,
           height: 60,
           padding: const EdgeInsetsDirectional.all(0),
-          color: AppThemes.infoColor,
-          splashColor: Theme.of(ctx).colorScheme.surfaceVariant,
+          color: isDisabled ? Colors.grey : AppThemes.infoColor,
+          splashColor: isDisabled
+              ? AppThemes.transparentColour
+              : Theme.of(ctx).colorScheme.surfaceVariant,
           textStyle: TextStyle(
-            color: Theme.of(ctx).colorScheme.background,
+            color: isDisabled
+                ? Theme.of(ctx).colorScheme.background.withOpacity(0.4)
+                : Theme.of(ctx).colorScheme.background,
             fontSize: 16,
           ),
           elevation: 3,

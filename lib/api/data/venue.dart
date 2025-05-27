@@ -3,9 +3,12 @@ class Venue {
   final String name;
   final String location;
   final String workingHours;
+  final int maximumCapacity;
+  final int availableCapacity;
   double rating;
   final int typeId;
   String? description;
+
   // final List<String> imageLinks;
 
   Venue({
@@ -13,6 +16,8 @@ class Venue {
     required this.name,
     required this.location,
     required this.workingHours,
+    required this.maximumCapacity,
+    required this.availableCapacity,
     required this.rating,
     required this.typeId,
     this.description,
@@ -25,6 +30,8 @@ class Venue {
       name: map['name'],
       location: map['location'],
       workingHours: map['workingHours'],
+      maximumCapacity: map['maximumCapacity'],
+      availableCapacity: map['availableCapacity'],
       rating: map['averageRating'],
       typeId: map['venueTypeId'],
       description: map['description'],
@@ -38,6 +45,8 @@ class Venue {
       'name': name,
       'location': location,
       'workingHours': workingHours,
+      'maximumCapacity': maximumCapacity,
+      'availableCapacity': availableCapacity,
       'rating': rating,
       'type': typeId,
       'description': description,
@@ -59,6 +68,8 @@ class Venue {
         other.name == name &&
         other.location == location &&
         other.workingHours == workingHours &&
+        other.maximumCapacity == maximumCapacity &&
+        other.availableCapacity == availableCapacity &&
         other.rating == rating &&
         other.typeId == typeId &&
         other.description == description;
@@ -70,6 +81,8 @@ class Venue {
         name.hashCode ^
         location.hashCode ^
         workingHours.hashCode ^
+        maximumCapacity.hashCode ^
+        availableCapacity.hashCode ^
         rating.hashCode ^
         typeId.hashCode ^
         description.hashCode;

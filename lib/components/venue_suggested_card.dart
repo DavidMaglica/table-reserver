@@ -90,9 +90,13 @@ class _VenueSuggestedCardState extends State<VenueSuggestedCard> {
                   children: [
                     _buildImage(),
                     _buildNameAndType(widget.venue.name, _venueType),
-                    _buildLocationAndWorkingHours(
-                        widget.venue.location, widget.venue.workingHours),
-                    _buildRatingBar(widget.venue.rating),
+                    _buildLocationAndAvailability(
+                      widget.venue.location,
+                      widget.venue.maximumCapacity,
+                      widget.venue.availableCapacity,
+                    ),
+                    _buildRatingBarAndWorkingHours(
+                        widget.venue.rating, widget.venue.workingHours),
                   ],
                 )),
           ),
@@ -141,7 +145,20 @@ class _VenueSuggestedCardState extends State<VenueSuggestedCard> {
         ));
   }
 
-  Widget _buildLocationAndWorkingHours(String location, String workingHours) {
+  Widget _buildLocationAndAvailability(
+    String location,
+    int maximumCapacity,
+    int availableCapacity,
+  ) {
+    final ratio =
+        maximumCapacity > 0 ? availableCapacity / maximumCapacity : 0.0;
+
+    final Color availabilityColor = ratio >= 0.6
+        ? AppThemes.successColor
+        : ratio >= 0.3
+            ? AppThemes.warningColor
+            : Colors.red;
+
     return Padding(
       padding: const EdgeInsetsDirectional.fromSTEB(8, 8, 8, 0),
       child: Row(
@@ -153,43 +170,71 @@ class _VenueSuggestedCardState extends State<VenueSuggestedCard> {
                 fontWeight: FontWeight.w800,
                 fontSize: 10,
               )),
-          Text(
-            workingHours,
-            style:
-                Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 9),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Icon(
+                CupertinoIcons.person_2_fill,
+                color: availabilityColor,
+                size: 12,
+              ),
+              const SizedBox(width: 4),
+              Text(
+                '$availableCapacity/$maximumCapacity',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: availabilityColor,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 10),
+              ),
+            ],
           ),
         ],
       ),
     );
   }
 
-  Widget _buildRatingBar(double rating) {
+  Widget _buildRatingBarAndWorkingHours(double rating, String workingHours) {
     return Padding(
-      padding: const EdgeInsetsDirectional.fromSTEB(08, 8, 0, 0),
+      padding: const EdgeInsetsDirectional.fromSTEB(8, 8, 8, 0),
       child: Row(
         mainAxisSize: MainAxisSize.max,
         crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          RatingBarIndicator(
-            itemBuilder: (context, index) => Icon(
-              CupertinoIcons.star_fill,
-              color: Theme.of(context).colorScheme.onTertiary,
-            ),
-            direction: Axis.horizontal,
-            rating: rating,
-            unratedColor: const Color(0xFF57636C).withOpacity(0.5),
-            itemCount: 5,
-            itemSize: 14,
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              RatingBarIndicator(
+                itemBuilder: (context, index) => Icon(
+                  CupertinoIcons.star_fill,
+                  color: Theme.of(context).colorScheme.onTertiary,
+                ),
+                direction: Axis.horizontal,
+                rating: rating,
+                unratedColor: const Color(0xFF57636C).withOpacity(0.5),
+                itemCount: 5,
+                itemSize: 14,
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 4, top: 2),
+                child: Text(
+                  ' ${rating.toStringAsFixed(1)}',
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyMedium
+                      ?.copyWith(fontSize: 10, fontWeight: FontWeight.w500),
+                ),
+              ),
+            ],
           ),
-          Padding(
-            padding: const EdgeInsets.only(left: 4, top: 2),
-            child: Text(
-              ' ${rating.toStringAsFixed(1)}',
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyMedium
-                  ?.copyWith(fontSize: 10, fontWeight: FontWeight.w500),
-            ),
+          Text(
+            workingHours,
+            style:
+                Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 9),
           ),
         ],
       ),
